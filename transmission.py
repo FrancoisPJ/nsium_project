@@ -99,15 +99,3 @@ def NSITTP_request(data: str, action: str) -> str:
 
 
 	return f"{action} {secret_key} NSITTP\n.\n{data}"
-
-
-
-robot = RobotConnexion(input("ip: "), robot_port=int(input("port: ")))
-
-while True:
-	cmd = input("> ")
-	if cmd == "stop":
-		break
-	req = NSITTP_request(cmd, "DO")
-	output = robot.send(req)
-	print(output)
