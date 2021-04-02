@@ -36,10 +36,19 @@ class Robot(object):
 	def stick_down(self, angle: int, speed=100) -> None:
 		self.stick_motor.run_angle(speed, -angle)
 		return "done"
+		
+	def get_nsium(self) -> str:
+		print("Analise du sol")
+		return str(random.randint(0, 100))
+
+	def get_wall_distance(self) -> str:
+		print("Analise de l'environnement")
+		return str(random.randint(0, 2500))
 
 
-ROBOT_ACTIONS = { "motor", "rotate", "stick" }
-ROBOT_DIRECTION = { "up", "down", "left", "right" }
+
+ROBOT_ACTIONS = { "motor", "rotate", "stick", "capteur" }
+ROBOT_DIRECTION = { "up", "down", "left", "right", "nsium%", "walldistance" }
 
 
 class Request(object):
@@ -57,12 +66,10 @@ class Request(object):
 		if not self.is_valid_request(raw_request):
 			raise RequestError()
 
-		if not self._check_command(self.raw_content[2]):
-			raise ActionError()
-
 		self.action = self.raw_content[0].split(' ')[0]
 
-	
+		if not self._check_command(self.raw_content[2]):
+			raise ActionError()
 
 	def _check_command(self, command: str) -> bool:
 		"""
@@ -73,8 +80,13 @@ class Request(object):
 		:rtype: bool
 		"""
 		content = command.split(":")
+		print(content)
 		if len(content) != 2:
 			return False
+
+		"""if self.action == "GET":
+									if content[0] in ROBOT_ACTIONS:
+										return True"""
 
 		action = content[0].split("_")
 		if len(action) != 2:
@@ -86,19 +98,18 @@ class Request(object):
 
 		return True
 
-
 	def extract_action(self) -> tuple:
 		"""
 		Extrait ce que l'on a besoin pour effectuer l'action requise
 
 		:return: (action, direction, value)
 		"""
-		data = self.raw_content[2].split("_")
+		data = self.raw_content[2].split("_")  # if self.action == "DO" else (None, self.raw_content[2])
 		action = data[0]
-		direction = data[1].split(":")[0]
+		option = data[1].split(":")[0]
 		value = data[1].split(":")[1]
 
-		return (action, direction, value)
+		return (action, option, value)
 
 	@classmethod
 	def is_valid_request(self, content: str) -> bool:
