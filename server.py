@@ -32,7 +32,8 @@ ACTIONS = {
 			},
 
 		'GET': {
-			'none': None
+			'nsium%': robot.get_nsium,
+			'walldistance': robot.get_wall_distance
 			}
 		}
 
@@ -51,7 +52,10 @@ while True:
 		continue
 
 	command = request.extract_action()
-	action = ACTIONS[request.action][command[0]][command[1]](int(command[2]))
+	if request.action == "DO":
+		action = ACTIONS[request.action][command[0]][command[1]](int(command[2]))
+	else:
+		action = ACTIONS[request.action][command[1]]()
 
 	client.send(("ok " + action).encode("utf-8"))
 
